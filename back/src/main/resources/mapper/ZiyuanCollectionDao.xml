@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZiyuanCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.ziyuan_id as ziyuanId
+        ,a.yonghu_id as yonghuId
+        ,a.ziyuan_collection_types as ziyuanCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZiyuanCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.yonghu_types as yonghuTypes
+        ,yonghu.yonghu_delete as yonghuDelete
+        ,ziyuan.ziyuan_uuid_number as ziyuanUuidNumber
+        ,ziyuan.ziyuan_name as ziyuanName
+        ,ziyuan.ziyuan_photo as ziyuanPhoto
+        ,ziyuan.zan_number as zanNumber
+        ,ziyuan.cai_number as caiNumber
+        ,ziyuan.ziyuan_types as ziyuanTypes
+        ,ziyuan.ziyuan_content as ziyuanContent
+        ,ziyuan.ziyuan_delete as ziyuanDelete
+
+        FROM ziyuan_collection  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN ziyuan ziyuan ON a.ziyuan_id = ziyuan.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.ziyuanId != null and params.ziyuanId != ''">
+                and (
+                    a.ziyuan_id = #{params.ziyuanId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.ziyuanCollectionTypes != null and params.ziyuanCollectionTypes != ''">
+                and a.ziyuan_collection_types = #{params.ziyuanCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.yonghuTypes != null  and params.yonghuTypes != ''">
+                and yonghu.yonghu_types = #{params.yonghuTypes}
+            </if>
+
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断志愿资源的id不为空 -->
+            <if test=" params.ziyuanIdNotNull != '' and params.ziyuanIdNotNull != null and params.ziyuanIdNotNull != 'null' ">
+                and a.ziyuan_id IS NOT NULL
+            </if>
+            <if test=" params.ziyuanUuidNumber != '' and params.ziyuanUuidNumber != null and params.ziyuanUuidNumber != 'null' ">
+                and ziyuan.ziyuan_uuid_number like CONCAT('%',#{params.ziyuanUuidNumber},'%')
+            </if>
+            <if test=" params.ziyuanName != '' and params.ziyuanName != null and params.ziyuanName != 'null' ">
+                and ziyuan.ziyuan_name like CONCAT('%',#{params.ziyuanName},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and ziyuan.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and ziyuan.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and ziyuan.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and ziyuan.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and ziyuan.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and ziyuan.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.ziyuanTypes != null  and params.ziyuanTypes != ''">
+                and ziyuan.ziyuan_types = #{params.ziyuanTypes}
+            </if>
+
+            <if test=" params.ziyuanContent != '' and params.ziyuanContent != null and params.ziyuanContent != 'null' ">
+                and ziyuan.ziyuan_content like CONCAT('%',#{params.ziyuanContent},'%')
+            </if>
+            <if test="params.ziyuanDeleteStart != null  and params.ziyuanDeleteStart != '' ">
+                <![CDATA[  and ziyuan.ziyuan_delete >= #{params.ziyuanDeleteStart}   ]]>
+            </if>
+            <if test="params.ziyuanDeleteEnd != null  and params.ziyuanDeleteEnd != '' ">
+                <![CDATA[  and ziyuan.ziyuan_delete <= #{params.ziyuanDeleteEnd}   ]]>
+            </if>
+            <if test="params.ziyuanDelete != null  and params.ziyuanDelete != '' ">
+                and ziyuan.ziyuan_delete = #{params.ziyuanDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(ziyuan.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(ziyuan.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

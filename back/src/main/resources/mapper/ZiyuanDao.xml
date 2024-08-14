@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZiyuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.ziyuan_uuid_number as ziyuanUuidNumber
+        ,a.ziyuan_name as ziyuanName
+        ,a.ziyuan_photo as ziyuanPhoto
+        ,a.zan_number as zanNumber
+        ,a.cai_number as caiNumber
+        ,a.ziyuan_types as ziyuanTypes
+        ,a.ziyuan_content as ziyuanContent
+        ,a.ziyuan_delete as ziyuanDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZiyuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM ziyuan  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.ziyuanUuidNumber != '' and params.ziyuanUuidNumber != null and params.ziyuanUuidNumber != 'null' ">
+                and a.ziyuan_uuid_number like CONCAT('%',#{params.ziyuanUuidNumber},'%')
+            </if>
+            <if test=" params.ziyuanName != '' and params.ziyuanName != null and params.ziyuanName != 'null' ">
+                and a.ziyuan_name like CONCAT('%',#{params.ziyuanName},'%')
+            </if>
+            <if test="params.zanNumberStart != null and params.zanNumberStart != ''">
+                <![CDATA[  and a.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null and params.zanNumberEnd != ''">
+                <![CDATA[  and a.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+             <if test="params.zanNumber != null and params.zanNumber != ''">
+                and a.zan_number = #{params.zanNumber}
+             </if>
+            <if test="params.caiNumberStart != null and params.caiNumberStart != ''">
+                <![CDATA[  and a.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null and params.caiNumberEnd != ''">
+                <![CDATA[  and a.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+             <if test="params.caiNumber != null and params.caiNumber != ''">
+                and a.cai_number = #{params.caiNumber}
+             </if>
+            <if test="params.ziyuanTypes != null and params.ziyuanTypes != ''">
+                and a.ziyuan_types = #{params.ziyuanTypes}
+            </if>
+            <if test=" params.ziyuanContent != '' and params.ziyuanContent != null and params.ziyuanContent != 'null' ">
+                and a.ziyuan_content like CONCAT('%',#{params.ziyuanContent},'%')
+            </if>
+            <if test="params.ziyuanDeleteStart != null and params.ziyuanDeleteStart != ''">
+                <![CDATA[  and a.ziyuan_delete >= #{params.ziyuanDeleteStart}   ]]>
+            </if>
+            <if test="params.ziyuanDeleteEnd != null and params.ziyuanDeleteEnd != ''">
+                <![CDATA[  and a.ziyuan_delete <= #{params.ziyuanDeleteEnd}   ]]>
+            </if>
+             <if test="params.ziyuanDelete != null and params.ziyuanDelete != ''">
+                and a.ziyuan_delete = #{params.ziyuanDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
